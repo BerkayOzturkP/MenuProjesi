@@ -27,8 +27,29 @@
                      data-bs-parent="#categoriesAccordion">
                     <!-- Bu satır çok önemli -->
                     <div class="accordion-body">
-                        <!-- İçerik -->
+                        @if (category.Products != null && category.Products.Any())
+                        {
+                            <ul>
+                                @foreach (var p in category.Products)
+                                {
+                                    <li>
+                                        <strong>@p.Name</strong> - @p.Description - @p.Price
+
+                                        @if (!string.IsNullOrEmpty(p.ImagePath))
+                                        {
+                                            <br />
+                                            <img src="@p.ImagePath" alt="@p.Name Görseli" width="80" />
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p>Bu kategoride ürün yok.</p>
+                        }
                     </div>
+
                 </div>
             </div>
         }

@@ -15,5 +15,7 @@ namespace MenuProjesi.Models
         public DateTime CreatedDate { get; set; }
 
         public DateTime? UpdatedDate { get; set; }
+
+        public List<Products> Products { get; set; } = new List<Products>();
     }
 }

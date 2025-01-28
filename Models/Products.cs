@@ -2,7 +2,7 @@
 
 namespace MenuProjesi.Models
 {
-    public class Products : Controller
+    public class Products 
     {
         public int Id { get; set; }
 
@@ -21,5 +21,6 @@ namespace MenuProjesi.Models
         public DateTime CreatedDate { get; set; }
 
         public DateTime UpdatedDate { get; set; }
+
     }
 }

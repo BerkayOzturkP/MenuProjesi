@@ -17,14 +17,27 @@ namespace MenuProjesi.Controllers
 
         public IActionResult Index()
         {
-            var categories = _connection.Query<Categories>("SELECT * FROM Categories WHERE IsActive = 1 ");
+            
+            var categories = _connection.Query<Categories>("SELECT * FROM Categories WHERE IsActive = 1").ToList();
 
+            
+            foreach (var cat in categories)
+            {
+                var products = _connection.Query<Products>(
+                    "SELECT * FROM Products WHERE CategoryId = @cId AND IsActive = 1",
+                    new { cId = cat.Id }).ToList();
+
+                
+                cat.Products = products;
+            }
+
+            
             return View(categories);
         }
 
-        
 
-        
+
+
 
         public IActionResult Privacy()
         {

@@ -48,5 +48,13 @@ namespace MenuProjesi.Controllers
             return RedirectToAction("Editor", "Editor");
         }
 
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            _connection.Execute("DELETE FROM Categories WHERE Id = @id", new { id });
+
+            return RedirectToAction("Editor", "Editor");
+        }
+
     }
 }
