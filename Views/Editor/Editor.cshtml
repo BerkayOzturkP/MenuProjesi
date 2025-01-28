@@ -1,0 +1,64 @@
+﻿@model IEnumerable<MenuProjesi.Models.Categories>
+
+@{
+    ViewData["Title"] = "Kategori Yönetimi";
+}
+
+<div class="container mt-4">
+    <h2>Kategoriler</h2>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Kategori</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Model)
+            {
+                bool isEditing = ViewData["EditingId"] != null && (int)ViewData["EditingId"] == category.Id;
+
+                <tr>
+                    <td>
+                        @if (isEditing)
+                        {
+                            <form action="/Editor/Edit" method="post">
+                                <input type="hidden" name="Id" value="@category.Id" />
+                                <input type="text" name="CategoryName" class="form-control" value="@category.CategoryName" required />
+                                <button type="submit" class="btn btn-success btn-sm ms-2 mt-2">Güncelle</button>
+                                <a href="/Editor/Editor" class="btn btn-secondary btn-sm ms-2 mt-2">İptal</a>
+                            </form>
+                        }
+                        else
+                        {
+                            <span>@category.CategoryName</span>
+                        }
+                    </td>
+                    <td>
+                        @if (!isEditing)
+                        {
+                            <a href="/Editor/Editor?editId=@category.Id" class="btn btn-primary btn-sm">Güncelle</a>
+                            <form action="/Editor/DeleteCategory" method="post" style="display:inline;">
+                                <input type="hidden" name="Id" value="@category.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                            </form>
+                            <a href="/Products/Manage/@category.Id" class="btn btn-info btn-sm">Ürünleri yönet</a>
+                        }
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+
+    <hr />
+
+    <h3>Kategori Ekle</h3>
+    <form action="/Editor/AddCategory" method="post">
+        <div class="input-group mb-3">
+            <input type="text" name="CategoryName" class="form-control" placeholder="Kategori Adı" required />
+            <button type="submit" class="btn btn-primary">Ekle</button>
+        </div>
+    </form>
+</div>
