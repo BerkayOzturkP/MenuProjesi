@@ -1,69 +1,72 @@
 ﻿@model IEnumerable<MenuProjesi.Models.Products>
+
 @{
     ViewBag.Title = "Ürün Yönetimi";
 }
-
-<h2>@ViewBag.CategoryName Ürünleri Yönetimi</h2>
-
-
-    <tbody>
-        @foreach(var product in Model)
-        {
-            <tr>
-                <td>@product.Name</td>
-                <td>@product.Description</td>
-                <td>@(product.Price.ToString("C"))</td>
-                <td>
-                    @if (!string.IsNullOrEmpty(product.ImagePath))
-                    {
-                        <img src="@product.ImagePath" alt="ürün görseli" width="80" />
-                    }
-                    else
-                    {
-                        <span>Resim yok</span>
-                    }
-                </td>
-                <td>
-                    <!-- Güncelleme action'ı için ayrı form ya da link kullanabilirsiniz -->
-                    <!-- Silme için bir POST formu: -->
-                    <form action="/Products/DeleteProduct" method="post" style="display:inline;">
-                        <input type="hidden" name="productId" value="@product.Id" />
-                        <input type="hidden" name="categoryId" value="@product.CategoryId" />
-                        <button type="submit" class="btn btn-danger btn-sm">
-                            Sil
-                        </button>
-                    </form>
-                    <!-- Güncellemek isterseniz: <a> veya <form> ekleyebilirsiniz -->
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
 <hr />
-<h3>Yeni Ürün Ekle</h3>
-<form action="/Products/AddProduct" method="post" enctype="multipart/form-data">
-    <input type="hidden" name="CategoryId" value="@ViewBag.CategoryId" />
-    
-    <div class="mb-3">
-        <label>Ürün Adı</label>
-        <input type="text" name="Name" class="form-control" required />
-    </div>
-    
-    <div class="mb-3">
-        <label>Detay</label>
-        <textarea name="Description" class="form-control"></textarea>
-    </div>
-    
-    <div class="mb-3">
-        <label>Fiyat</label>
-        <input type="number" name="Price" class="form-control" step="0.01" required />
-    </div>
-    
-    <div class="mb-3">
-        <label>Görsel (resim dosyası)</label>
-        <input type="file" name="ImageFile" class="form-control" />
-    </div>
-    
-    <button type="submit" class="btn btn-primary">Ekle</button>
-</form>
+<div class="container m-lg-5">
+    <h2>@ViewBag.CategoryName Ürünleri Yönetimi</h2>
+
+    <!-- Ürün Tablosu -->
+    <table class="table table-bordered table-hover">
+        
+        <tbody>
+            @foreach (var product in Model)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Description</td>
+                    <td>@product.Price.ToString("C")</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(product.ImagePath))
+                        {
+                            <img src="@product.ImagePath" alt="ürün görseli" class="img-thumbnail" width="80" />
+                        }
+                        else
+                        {
+                            <span class="text-muted">Resim yok</span>
+                        }
+                    </td>
+                    <td>
+                        <form action="/Products/DeleteProduct" method="post" class="d-inline">
+                            <input type="hidden" name="productId" value="@product.Id" />
+                            <input type="hidden" name="categoryId" value="@product.CategoryId" />
+                            <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                        </form>
+                        <a href="/Products/EditProduct/@product.Id" class="btn btn-primary btn-sm ms-2">Güncelle</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+
+    <!-- Yeni Ürün Ekleme Formu -->
+    <h3>Yeni Ürün Ekle</h3>
+    <form action="/Products/AddProduct" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="CategoryId" value="@ViewBag.CategoryId" />
+
+        <div class="mb-3">
+            <label class="form-label">Ürün Adı</label>
+            <input type="text" name="Name" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Detay</label>
+            <textarea name="Description" class="form-control"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Fiyat</label>
+            <input type="number" name="Price" class="form-control" step="0.01" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Görsel (resim dosyası)</label>
+            <input type="file" name="ImageFile" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Ekle</button>
+    </form>
+</div>

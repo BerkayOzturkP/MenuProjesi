@@ -1,64 +1,268 @@
 ﻿@model IEnumerable<MenuProjesi.Models.Categories>
-
 @{
     ViewData["Title"] = "Kategori Yönetimi";
 }
 
-<div class="container mt-4">
-    <h2>Kategoriler</h2>
+<style>
+    .category-list {
+        margin-top: 2rem;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Kategori</th>
-                <th>İşlemler</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var category in Model)
-            {
-                bool isEditing = ViewData["EditingId"] != null && (int)ViewData["EditingId"] == category.Id;
+    .category-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #eee;
+        transition: all 0.3s ease;
+    }
 
-                <tr>
-                    <td>
-                        @if (isEditing)
-                        {
-                            <form action="/Editor/Edit" method="post">
-                                <input type="hidden" name="Id" value="@category.Id" />
-                                <input type="text" name="CategoryName" class="form-control" value="@category.CategoryName" required />
-                                <button type="submit" class="btn btn-success btn-sm ms-2 mt-2">Güncelle</button>
-                                <a href="/Editor/Editor" class="btn btn-secondary btn-sm ms-2 mt-2">İptal</a>
-                            </form>
-                        }
-                        else
-                        {
-                            <span>@category.CategoryName</span>
-                        }
-                    </td>
-                    <td>
-                        @if (!isEditing)
-                        {
-                            <a href="/Editor/Editor?editId=@category.Id" class="btn btn-primary btn-sm">Güncelle</a>
-                            <form action="/Editor/Delete" method="post" style="display:inline;">
-                                <input type="hidden" name="Id" value="@category.Id" />
-                                <button type="submit"  class="btn btn-danger btn-sm">Sil</button>
-                            </form>
-                            <a href="/Products/Manage/@category.Id" class="btn btn-info btn-sm">Ürünleri yönet</a>
-                        }
-                    </td>
-                </tr>
+        .category-item:hover {
+            background-color: #f8f9fa;
+        }
 
-            }
-        </tbody>
-    </table>
+        .category-item:last-child {
+            border-bottom: none;
+        }
 
-    <hr />
+    .category-name {
+        font-size: 1.1rem;
+        color: #2d3436;
+        flex: 1;
+    }
 
-    <h3>Kategori Ekle</h3>
-    <form action="/Editor/AddCategory" method="post">
-        <div class="input-group mb-3">
-            <input type="text" name="CategoryName" class="form-control" placeholder="Kategori Adı" required />
-            <button type="submit" class="btn btn-primary">Ekle</button>
+    .category-form {
+        display: flex;
+        gap: 0.5rem;
+        flex: 1;
+    }
+
+    .category-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .btn-action {
+        padding: 0.4rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+
+    .btn-edit {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+        .btn-edit:hover {
+            background-color: #0b5ed7;
+            color: white;
+        }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+    }
+
+        .btn-delete:hover {
+            background-color: #bb2d3b;
+            color: white;
+        }
+
+    .btn-products {
+        background-color: #00b894;
+        color: white;
+    }
+
+        .btn-products:hover {
+            background-color: #00a28a;
+            color: white;
+        }
+
+    .btn-save {
+        background-color: #198754;
+        color: white;
+    }
+
+        .btn-save:hover {
+            background-color: #157347;
+            color: white;
+        }
+
+    .btn-cancel {
+        background-color: #6c757d;
+        color: white;
+    }
+
+        .btn-cancel:hover {
+            background-color: #5c636a;
+            color: white;
+        }
+
+    .add-category-btn {
+        margin-top: 1.5rem;
+        background-color: #e74c3c;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .add-category-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+    .category-header {
+        color: #2d3436;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+
+        .category-header:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: #e74c3c;
+        }
+
+    .form-control {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        border: 2px solid #eee;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+        }
+
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+    }
+
+    .modal-header {
+        background: #f8f9fa;
+        border-radius: 15px 15px 0 0;
+        border-bottom: 2px solid #eee;
+    }
+
+    .modal-footer {
+        background: #f8f9fa;
+        border-radius: 0 0 15px 15px;
+        border-top: 2px solid #eee;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2 class="category-header">Kategoriler</h2>
+
+    <div class="category-list">
+        @foreach (var category in Model)
+        {
+            bool isEditing = ViewData["EditingId"] != null && (int)ViewData["EditingId"] == category.Id;
+            <div class="category-item">
+                @if (isEditing)
+                {
+                    <form action="/Editor/Edit" method="post" class="category-form">
+                        <input type="hidden" name="Id" value="@category.Id" />
+                        <input type="text" name="CategoryName" class="form-control" value="@category.CategoryName" required />
+                        <button type="submit" class="btn-action btn-save">
+                            <i class="fas fa-check"></i>
+                            Kaydet
+                        </button>
+                        <a href="/Editor/Editor" class="btn-action btn-cancel">
+                            <i class="fas fa-times"></i>
+                            İptal
+                        </a>
+                    </form>
+                }
+                else
+                {
+                    <div class="category-name">@category.CategoryName</div>
+                    <div class="category-actions">
+                        <a href="/Editor/Editor?editId=@category.Id" class="btn-action btn-edit">
+                            <i class="fas fa-edit"></i>
+                            Düzenle
+                        </a>
+                        <form action="/Editor/Delete" method="post" class="d-inline">
+                            <input type="hidden" name="Id" value="@category.Id" />
+                            <button type="submit" class="btn-action btn-delete" onclick="return confirm('Bu kategoriyi silmek istediğinizden emin misiniz?')">
+                                <i class="fas fa-trash"></i>
+                                Sil
+                            </button>
+                        </form>
+                        <a href="/Products/Manage/@category.Id" class="btn-action btn-products">
+                            <i class="fas fa-box"></i>
+                            Ürünler
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <button type="button" class="add-category-btn" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+        <i class="fas fa-plus"></i>
+        Yeni Kategori Ekle
+    </button>
+</div>
+
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-folder-plus me-2"></i>
+                    Yeni Kategori Ekle
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/Editor/AddCategory" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Kategori Adı</label>
+                        <input type="text" name="CategoryName" class="form-control"
+                               placeholder="Kategori adını giriniz..." required />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>
+                        Vazgeç
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check me-1"></i>
+                        Ekle
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>

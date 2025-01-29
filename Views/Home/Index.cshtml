@@ -1,60 +1,165 @@
-﻿@model IEnumerable<MenuProjesi.Models.Categories> 
+﻿@using System.Linq
+@model IEnumerable<MenuProjesi.Models.Categories>
 
-@{
-    ViewData["Title"] = "Kategoriler";
-}
+<style>
+    .categories-header {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2d3436;
+        text-align: center;
+        margin-bottom: 2.5rem;
+        position: relative;
+        padding-bottom: 1rem;
+    }
 
+        .categories-header:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 3px;
+            background: #e74c3c;
+        }
+
+    .accordion-item {
+        border: none;
+        margin-bottom: 1.5rem;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .accordion-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+
+    .accordion-button {
+        background: #fff !important;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2d3436 !important;
+        padding: 1.5rem 2rem;
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+        .accordion-button:not(.collapsed) {
+            color: #e74c3c !important;
+            box-shadow: none;
+        }
+
+        .accordion-button::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%232d3436'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+            transform: scale(1.2);
+        }
+
+        .accordion-button:not(.collapsed)::after {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23e74c3c'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        }
+
+    .accordion-body {
+        background: #f9f9f9;
+        padding: 2rem;
+    }
+
+    .product-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+        padding: 0;
+    }
+
+    .product-item {
+        background: #fff;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        transition: transform 0.3s ease;
+        list-style: none;
+    }
+
+        .product-item:hover {
+            transform: translateY(-3px);
+        }
+
+    .product-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .product-price {
+        color: #27ae60;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .no-products {
+        color: #95a5a6;
+        font-style: italic;
+        text-align: center;
+        padding: 2rem;
+    }
+</style>
 
 <div class="container my-5">
-    <h2 class="mb-4">Kategoriler</h2>
+    <h2 class="categories-header">@ViewData["Title"]</h2>
     <div class="accordion" id="categoriesAccordion">
         @foreach (var category in Model)
         {
             <div class="accordion-item">
-                <h2 class="accordion-header" id="heading@category.Id">
+                <h2 class="accordion-header">
                     <button class="accordion-button collapsed"
                             type="button"
                             data-bs-toggle="collapse"
-                            data-bs-target="#collapse@category.Id"
+                            data-bs-target="#collapse_@(category.Id)"
                             aria-expanded="false"
-                            aria-controls="collapse@category.Id">
+                            aria-controls="collapse_@(category.Id)">
                         @category.CategoryName
                     </button>
                 </h2>
-                <div id="collapse@category.Id"
+                <div id="collapse_@(category.Id)"
                      class="accordion-collapse collapse"
-                     aria-labelledby="heading@category.Id"
                      data-bs-parent="#categoriesAccordion">
-                    <!-- Bu satır çok önemli -->
                     <div class="accordion-body">
                         @if (category.Products != null && category.Products.Any())
                         {
-                            <ul>
+                            <ul class="product-list">
                                 @foreach (var p in category.Products)
                                 {
-                                    <li>
-                                        <strong>@p.Name</strong> - @p.Description - @p.Price
-
+                                    <li class="product-item">
                                         @if (!string.IsNullOrEmpty(p.ImagePath))
                                         {
-                                            <br />
-                                            <img src="@p.ImagePath" alt="@p.Name Görseli" width="80" />
+                                            <img src="@Url.Content(p.ImagePath)" alt="@p.Name" class="product-image">
                                         }
+                                        <h5 class="fw-bold mb-2">@p.Name</h5>
+                                        <p class="text-muted mb-2">@p.Description</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="product-price">@p.Price.ToString("N2") ₺</span>
+                                            @if (!string.IsNullOrEmpty(p.ImagePath))
+                                            {
+                                                <small class="text-muted"><i class="fas fa-image"></i></small>
+                                            }
+                                        </div>
                                     </li>
                                 }
                             </ul>
                         }
                         else
                         {
-                            <p>Bu kategoride ürün yok.</p>
+                            <div class="no-products">
+                                <i class="fas fa-utensils-slash fs-4 mb-2"></i>
+                                <p class="mb-0">Bu kategoride henüz ürün bulunmamaktadır</p>
+                            </div>
                         }
                     </div>
-
                 </div>
             </div>
         }
     </div>
 </div>
-
-
-
